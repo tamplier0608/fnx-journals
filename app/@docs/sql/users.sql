@@ -1,0 +1,2 @@
+INSERT INTO users (username, password, wallet) VALUES ('test-user1', '13fa508eacfa943f8b0c51a46561fc89', 999);
+INSERT INTO users (username, password, wallet) VALUES ('test-user2', 'a5689a0f9fc49923783a896dbb765ae9', 999);

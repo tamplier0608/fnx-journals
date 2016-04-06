@@ -1,0 +1,56 @@
+<article style="border: none;">
+    <h2><?=$this->escape($article->title)?></h2>
+
+    <?php if (($isLoggedUser && $isFreeArticle) || (!$isFreeArticle && $article->isPurchased)): ?>
+    <section class="content">
+        <?=$this->escape($article->content)?>
+    </section>
+    <?php else: ?>
+    <section class="short-desc">
+        <?=$this->escape($article->shortDescription)?>
+
+        <?php if ($isFreeArticle): ?>
+        <div class="panel panel-warning" style="margin-top: 20px;">
+            <div class="panel-body">
+                If you want to read more please <a href="<?=$this->baseUrl()?>/login">Log in</a>
+            </div>
+        </div>
+        <?php else: ?>
+            <div class="panel panel-warning" style="margin-top: 20px;">
+                <div class="panel-body">
+                    If you want to read more please buy article.
+                    <a
+                        class="btn btn-success pull-right"
+                        <?php if ($isLoggedUser): ?>onclick="if (!confirm('You will be charged for $<?=$article->price?>. Dou you confirm the purchase?')) return false;"<?php endif; ?>
+                        href="<?=$this->baseUrl()?>/user/buy/<?=$article->articleId?>">Buy $<?=$article->price?>
+                    </a>
+                </div>
+            </div>
+
+        <?php endif; ?>
+
+    </section>
+    <?php endif; ?>
+
+    <section class="meta">
+        <?php if (count($article->authors)): $counter = 1;?>
+            <i class="glyphicon glyphicon-user"></i>
+            <?php foreach ($article->authors as $author): ?>
+                <a href="<?=$this->baseUrl()?>/author/<?=$author->authorId?>"><?=$this->escape($author->firstName) . ' ' . $this->escape($author->lastName)?></a><?php if ($counter != count($article->authors)) { echo ','; $counter++; } ?>
+            <?php endforeach; ?>
+        <?php endif; ?> |
+
+        <?php if (!empty($article->category)): ?>
+            <i class="glyphicon glyphicon-folder-close"></i>
+            <a href="<?=$this->baseUrl()?>/category/<?=$article->category->categoryId?>"><?=$this->escape($article->category->name)?></a> |
+        <?php endif; ?>
+
+        <?php if (count($article->tags)): $counter = 1;?>
+            <i class="glyphicon glyphicon-tag"></i>
+            <?php foreach ($article->tags as $tag): ?>
+                <a href=""><?=$this->escape($tag->tagName)?></a><?php if ($counter != count($article->tags)) { echo ','; $counter++; } ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </section>
+
+</article>

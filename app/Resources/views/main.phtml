@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../favicon.ico">
+
+        <title><?=$this->head()->getTitle();?></title>
+        <?=$this->head()?>
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div class="container">
+<?php //var_dump($_SESSION); ?>
+            <div class="header clearfix">
+                <nav>
+                    <ul class="nav nav-pills pull-right">
+                        <?php if ($isLoggedUser): ?>
+                        <li role="presentation">
+                            <span class="amount"><i class="glyphicon glyphicon-usd"></i><?=$this->escape($user->wallet);?></span>
+                        </li>
+                        <?php endif; ?>
+                        <li role="presentation">
+                            <?php if ($isLoggedUser): ?>
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="glyphicon glyphicon-user"></i> <?=$this->escape($user->username)?>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a href="<?=$this->baseUrl()?>/user/collection">Collection</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="<?=$this->baseUrl()?>/logout">Logout</a></li>
+                                </ul>
+                            </div>
+                            <?php else: ?>
+                            <a href="<?=$this->baseUrl()?>/login">Log in</a>
+                            <?php endif; ?>
+                        </li>
+                    </ul>
+                </nav>
+                <h3 class="text-muted"><a href="<?=$this->baseUrl()?>">FNX Journals</a></h3>
+            </div>
+
+            <main class="col-sm-9">
+
+                <?php if (isset($flashBag) && count($flashBag->all())): ?>
+                    <?php foreach ($flashBag->all() as $key => $flash): ?>
+                    <div class="alert alert-<?=$key?> alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <?=$flash?>
+                    </div>
+                    <?php $flashBag->remove($key); ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?=$content?>
+            </main>
+            <aside class="col-sm-3">
+                <?php if (count($categories)): ?>
+                <section>
+                    <h4>Categories</h4>
+                    <ul>
+                        <?php foreach ($categories as $category): ?>
+                        <li>
+                            <a href="<?=$this->baseUrl()?>/category/<?=$category->categoryId?>">
+                                <?=$this->escape($category->name)?></a> (<?=$category->art_count?>)
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </section>
+                <?php endif; ?>
+                <?php if (count($authors)): ?>
+                    <section>
+                        <h4>Authors</h4>
+                        <ul>
+                            <?php foreach ($authors as $author): ?>
+                                <li>
+                                    <a href="<?=$this->baseUrl()?>/author/<?=$author->authorId?>">
+                                        <?=$this->escape($author->firstName)?> <?=$this->escape($author->lastName)?></a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </section>
+                <?php endif; ?>
+
+
+            </aside>
+
+            <div class="clearfix"></div>
+
+            <footer class="footer">
+                <p>&copy; FNX Journals 2016</p>
+            </footer>
+
+        </div> <!-- /container -->
+    </body>
+</html>

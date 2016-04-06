@@ -1,0 +1,10 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <p class="author-name"><?=$this->escape($author->firstName)?>  <?=$this->escape($author->lastName)?></>
+    </div>
+    <div class="panel-body">
+        <p><?=$author->about?></p>
+    </div>
+</div>
+<h1 class="page-title">Aticles written by author: </h1>
+<?php include('__articles.phtml'); ?>

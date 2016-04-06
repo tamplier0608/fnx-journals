@@ -1,0 +1,24 @@
+
+<?php if (count($orders)): ?>
+<h1>Articles you've purchased:</h1>
+<table class="table table-bordered table-stripped">
+    <tr>
+        <th>OrderId</th>
+        <th>Title of article</th>
+        <th>Description</th>
+        <th>Purchased at</th>
+        <th>Price</th>
+    </tr>
+    <?php foreach ($orders as $order): ?>
+    <tr>
+        <td><?=$this->escape($order->orderId)?></td>
+        <td><a href="<?=$this->baseUrl()?>/article/<?=$order->articleId?>"><?=$this->escape($order->title)?></a></td>
+        <td><?=$this->escape($order->shortDescription)?></td>
+        <td><?=$this->escape($order->orderDate)?></td>
+        <td><?=$this->escape($order->price)?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+<?php else: ?>
+<p>You haven't purchased any articles.</p>
+<?php endif; ?>

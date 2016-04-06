@@ -1,0 +1,113 @@
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Custom page header */
+.header { padding-bottom: 20px; border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 { margin-top: 0; margin-bottom: 0; line-height: 40px; }
+
+/* Custom page footer */
+.footer { padding-top: 19px; color: #777; border-top: 1px solid #e5e5e5; }
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container { max-width: 960px; }
+}
+.container-narrow > hr { margin: 30px 0; }
+
+/* Main marketing message and sign up button */
+.jumbotron { text-align: center; border-bottom: 1px solid #e5e5e5; }
+.jumbotron .btn { padding: 14px 24px; font-size: 21px; }
+.jumbotron h1 { font-size: 32px; }
+
+/* Supporting marketing content */
+.marketing {  margin: 40px 0;  }
+.marketing p + h4 {  margin-top: 28px;  }
+form.login { width: 80%; margin: 0 auto; }
+
+section.meta { margin: 20px 0; }
+aside section { margin: 0 0 25px 0; }
+aside section ul { list-style: square; padding: 0 20px; }
+.page-title { color: #23527c; font-size: 32px; }
+article h2 { font-size: 25px; margin: 20px 0; }
+.author-name { font-size: 25px; margin: 0; }
+.panel-heading { font-size: 25px; margin: 0; text-align: center; }
+
+article {
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #E0E0E0;
+  padding: 10px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.remark {
+  transform: rotate(45deg) translate(56px, 0px);
+  width: 183px;
+  height: 30px;
+  color: whitesmoke;
+  position: absolute;
+  right: 0;
+  line-height: 28px;
+  top: 0px;
+  text-align: center;
+}
+
+.remark.free {
+  background: green;
+  background: linear-gradient(rgba(60,147,60, 0.8), rgba(00,128,00, 0.8));
+}
+
+.remark.purchased {
+  background: orangered;
+  background: linear-gradient(rgba(234, 118, 49, 0.9), rgba(226, 129, 8, 0.9))
+}
+
+span.amount { position: absolute;
+  top: 9px;
+  right: 0px;
+  width: 80px;
+  text-align: center;
+}
+
+.glyphicon { display:inline-block; }
+
+.paginaton { margin: 20px; }
+.paginaton a {
+  -moz-appearance: button;
+  -webkit-appearance: button;
+  appearence: button;
+  text-decoration: none;
+  color: initial;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header { margin-bottom: 30px; }
+
+
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron { border-bottom: 0; }
+}
