@@ -34,6 +34,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @param $requestUri
+     * @param $scriptName
+     * @return static
+     */
+    public function createFakeRequest($requestUri, $scriptName)
+    {
+        $_SERVER['REQUEST_URI'] = $requestUri;
+        $_SERVER['SCRIPT_NAME'] = $scriptName;
+        $_SERVER['PHP_SELF'] = $scriptName;
+        $request = \Core\Request::createFromGlobals();
+        return $request;
+    }
+
     public function uriScriptNameProvider()
     {
         return array(
@@ -71,19 +85,5 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $request = $this->createFakeRequest('/fnx-journals/article-list', '/fnx-journals/index.php');
         $this->setExpectedException('\Core\Application\Exception', 'Action does not exist: ');
         $this->app->handle($request);
-    }
-
-    /**
-     * @param $requestUri
-     * @param $scriptName
-     * @return static
-     */
-    public function createFakeRequest($requestUri, $scriptName)
-    {
-        $_SERVER['REQUEST_URI'] = $requestUri;
-        $_SERVER['SCRIPT_NAME'] = $scriptName;
-        $_SERVER['PHP_SELF'] = $scriptName;
-        $request = \Core\Request::createFromGlobals();
-        return $request;
     }
 }

@@ -34,6 +34,12 @@ class FlashBagTest extends PHPUnit_Framework_TestCase
         $notice = $this->flashBag->get('notice');
 
         $this->assertArrayHasKey($this->flashesKey, $_SESSION[$this->sessionKey]);
+        $this->assertNotEmpty($_SESSION[$this->sessionKey][$this->flashesKey]);
+
+        $notice = $this->flashBag->get('notice', null, $remove = true);
+
+        $this->assertArrayHasKey($this->flashesKey, $_SESSION[$this->sessionKey]);
         $this->assertEmpty($_SESSION[$this->sessionKey][$this->flashesKey]);
+
     }
 }

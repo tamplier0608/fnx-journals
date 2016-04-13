@@ -7,17 +7,58 @@ use Core\Db;
  * Class Repository
  * @package Core\Db
  */
-class Repository
+abstract class Repository
 {
     protected static $table;
     protected static $rowClass;
 
     protected static $db;
 
+    public static function beginTransaction()
+    {
+        static::$db->exec('BEGIN TRANSACTION;');
+    }
+
+    public static function commitTransaction()
+    {
+        static::$db->exec('COMMIT');
+    }
+
+    public static function rollbackTransaction()
+    {
+        static::$db->exec('ROLLBACK;');
+    }
+
+    public static function setDefaultDbAdapter(Db $db)
+    {
+        static::$db = $db;
+    }
+
+    public static function getDbAdapter() {
+        if (null === static::$db) {
+            throw new \RuntimeException('Database adapter is not set!');
+        }
+        return static::$db;
+    }
+
     public function countAll()
     {
         $sth = $this->executeQuery('SELECT COUNT(*) as count FROM ' . static::$table);
         return $sth->fetch(\PDO::FETCH_ASSOC)['count'];
+    }
+
+    /**
+     * @param $sql
+     * @return mixed
+     */
+    protected function executeQuery($sql, $params = array())
+    {
+        $sth = static::$db->exec($sql, $params);
+
+        if (!$sth instanceof \PDOStatement) {
+            throw new \RuntimeException("Error in SQL statement: '$sql'. " . __CLASS__ );
+        }
+        return $sth;
     }
 
     /**
@@ -53,20 +94,6 @@ class Repository
     }
 
     /**
-     * @param $sql
-     * @return mixed
-     */
-    protected function executeQuery($sql, $params = array())
-    {
-        $sth = static::$db->exec($sql, $params);
-
-        if (!$sth instanceof \PDOStatement) {
-            throw new \RuntimeException("Error in SQL statement: '$sql'. " . __CLASS__ );
-        }
-        return $sth;
-    }
-
-    /**
      * @param $sth
      * @return array
      */
@@ -78,32 +105,5 @@ class Repository
             $rowSet[] = $row;
         }
         return $rowSet;
-    }
-
-    public static function beginTransaction()
-    {
-        static::$db->exec('BEGIN TRANSACTION;');
-    }
-
-    public static function commitTransaction()
-    {
-        static::$db->exec('COMMIT');
-    }
-
-    public static function rollbackTransaction()
-    {
-        static::$db->exec('ROLLBACK;');
-    }
-
-    public static function setDefaultDbAdapter(Db $db)
-    {
-        static::$db = $db;
-    }
-
-    public static function getDbAdapter() {
-        if (null === static::$db) {
-            throw new \RuntimeException('Database adapter is not set!');
-        }
-        return static::$db;
     }
 }

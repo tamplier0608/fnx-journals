@@ -55,12 +55,11 @@
             <main class="col-sm-9">
 
                 <?php if (isset($flashBag) && count($flashBag->all())): ?>
-                    <?php foreach ($flashBag->all() as $key => $flash): ?>
+                    <?php foreach ($flashBag->all($remove = true) as $key => $flash): ?>
                     <div class="alert alert-<?=$key?> alert-dismissable" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <?=$flash?>
                     </div>
-                    <?php $flashBag->remove($key); ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
 

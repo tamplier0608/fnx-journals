@@ -21,7 +21,7 @@ class Bootstrap extends BootstrapAbstract
     {
         $dbAdapter = new \Core\Db($this->application->getResource('appConfig')['db']);
 
-        \Core\Db\Row::setDefaultDbAdapter($dbAdapter);
+        Core\Db\Row::setDefaultDbAdapter($dbAdapter);
         Core\Db\Repository::setDefaultDbAdapter($dbAdapter);
 
         $this->application->addResource('db', $dbAdapter);
@@ -44,6 +44,16 @@ class Bootstrap extends BootstrapAbstract
         ) {
             $layout = new View($appConfig['layout']['path']);
 
+            # init resources
+            $baseUrl = $request->getBaseUrl();
+            $layout->head()->setTitle('FNX Journals');
+            $layout->head()->addStyleSheet($baseUrl . '/assets/css/bootstrap.min.css');
+            $layout->head()->addStyleSheet($baseUrl . '/assets/css/bootstrap-theme.min.css');
+            $layout->head()->addStyleSheet($baseUrl . '/assets/css/jumbotron-narrow.css');
+            $layout->head()->addScript($baseUrl . '/assets/js/jquery.js');
+            $layout->head()->addScript($baseUrl . '/assets/js/bootstrap.min.js');
+
+            # init layout variables
             $isLoggedUser = false;
             if ($request->session->has('user')) {
                 $layout->assign('user', $request->session->get('user'));
@@ -55,7 +65,7 @@ class Bootstrap extends BootstrapAbstract
             $categories = $this->getCategoryList();
             $layout->assign('categories', $categories);
 
-            # set data for list of authoes in sidebar
+            # set data for list of authors in sidebar
             $authors = $this->getAuthorList();
             $layout->assign('authors', $authors);
 
@@ -83,20 +93,10 @@ class Bootstrap extends BootstrapAbstract
         return $authors;
     }
 
-    public function __initResources()
+    public function __initView()
     {
         $appConfig = $this->application->getResource('appConfig');
-        $request = \Core\Request::createFromGlobals();
-        $baseUrl = $request->getBaseUrl();
-
         $view = new View($appConfig['view']['path']);
-        $view->head()->setTitle('FNX Journals');
-        $view->head()->addStyleSheet($baseUrl . '/assets/css/bootstrap.min.css');
-        $view->head()->addStyleSheet($baseUrl . '/assets/css/bootstrap-theme.min.css');
-        $view->head()->addStyleSheet($baseUrl . '/assets/css/jumbotron-narrow.css');
-        $view->head()->addScript($baseUrl . '/assets/js/jquery.js');
-        $view->head()->addScript($baseUrl . '/assets/js/bootstrap.min.js');
-
         $this->application->addResource('view', $view);
     }
 }

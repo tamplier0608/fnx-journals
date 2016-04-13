@@ -8,7 +8,7 @@ use Core\Db;
  * Class Row
  * @package Core\Db
  */
-class Row
+abstract class Row
 {
     /**
      * @var Table name
@@ -40,6 +40,36 @@ class Row
     }
 
     /**
+     * @return mixed
+     */
+    protected function fetch()
+    {
+        $query = $this->buildFetchQuery();
+        $sth = self::getDbAdapter()->exec($query, array($this->{static::$primaryKey}));
+
+        if (!$sth instanceof \PDOStatement) {
+            return false;
+        }
+
+        return $sth->fetchObject();
+    }
+
+    protected function buildFetchQuery()
+    {
+        $query = 'SELECT * FROM ' . static::$table;
+        $query .= ' WHERE ' . static::$primaryKey . ' = ?';
+
+        return $query;
+    }
+
+    public static function getDbAdapter() {
+        if (null === static::$db) {
+            throw new \RuntimeException('Database adapter is not set!');
+        }
+        return static::$db;
+    }
+
+    /**
      * @param $data
      */
     public function fill($data)
@@ -51,6 +81,11 @@ class Row
         foreach ($data as $field => $value) {
             $this->{$field} = $value;
         }
+    }
+
+    public static function setDefaultDbAdapter(Db $db)
+    {
+        static::$db = $db;
     }
 
     /**
@@ -89,51 +124,28 @@ class Row
         return empty($vars);
     }
 
-    protected function getPublicVars()
-    {
-        $me = $this;
-
-        $vars = function () use ($me) {
-            return get_object_vars($me);
-        };
-
-        return $vars();
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function fetch()
-    {
-        $db = self::getDbAdapter();
-
-        $sql = 'SELECT * FROM `' . static::$table . '`';
-        $sql .= ' WHERE `' . static::$primaryKey . '` = ?';
-        $sth = $db->exec($sql, array($this->{static::$primaryKey}));
-
-        if (!$sth instanceof \PDOStatement) {
-            return false;
-        }
-
-        return $sth->fetchObject();
-    }
-
     /**
      * @return mixed
      */
     public function delete()
     {
-        $db = static::getDbAdapter();
-
-        $sql = 'DELETE FROM `' . static::$table . '`';
-        $sql .= ' WHERE `' . static::$primaryKey . '` = ?';
-
-        $sth = $db->exec($sql, array($this->{static::$primaryKey}));
+        $query = $this->buildDeleteQuery();
+        $sth = static::getDbAdapter()->exec($query, array($this->{static::$primaryKey}));
 
         if (!$sth instanceof \PDOStatement) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildDeleteQuery()
+    {
+        $sql = 'DELETE FROM ' . static::$table;
+        $sql .= ' WHERE ' . static::$primaryKey . ' = ?';
+        return $sql;
     }
 
     /**
@@ -143,34 +155,49 @@ class Row
      */
     public function save()
     {
-        $sql = 'INSERT INTO ' . static::$table;
+        $sql = $this->buildSaveQuery();
 
-        $values = '';
-        $fields = ' (';
-        $params = '';
+        $result = static::getDbAdapter()->exec($sql);
 
-        foreach ($this->getPublicVars() as $field => $value) {
-            $fields .= '`' . $field . '`, ';
-            $params .= '`' . $field . '` = "' . $value . '", ';
-
-            $values .= '"' . $value . '", ';
-        }
-
-        $fields = rtrim($fields, ', ') . ')';
-        $values = rtrim($values, ', ');
-        $params = rtrim($params, ', ');
-
-        $sql .= $fields . ' VALUES (' . $values . ') ';
-        $sql .= 'ON DUPLICATE KEY UPDATE ' . $params;
-
-        $db = static::getDbAdapter();
-
-        $result = $db->exec($sql);
         if (!$result instanceof \PDOStatement) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildSaveQuery()
+    {
+        $query = 'INSERT INTO ' . static::$table;
+
+        $values = array();
+        $fields = array();
+        $params = array();
+
+        foreach ($this->getPublicVars() as $field => $value) {
+            $fields[] = $field;
+            $params[] = $field . '= "' . $value . '"';
+            $values[] = '"' . $value . '"';
+        }
+
+        $query .= ' (' . implode(',', $fields) . ') VALUES (' . implode(',', $values) . ') ';
+        $query .= 'ON DUPLICATE KEY UPDATE ' . implode(',', $params);
+
+        return $query;
+    }
+
+    protected function getPublicVars()
+    {
+        $me = $this;
+
+        $vars = function () use ($me) {
+            return get_object_vars($me);
+        };
+
+        return $vars();
     }
 
     /**
@@ -192,17 +219,5 @@ class Row
         $this->fill($fields);
 
         return $this;
-    }
-
-    public static function setDefaultDbAdapter(Db $db)
-    {
-        static::$db = $db;
-    }
-
-    public static function getDbAdapter() {
-        if (null === static::$db) {
-            throw new \RuntimeException('Database adapter is not set!');
-        }
-        return static::$db;
     }
 }

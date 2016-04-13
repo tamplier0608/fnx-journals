@@ -23,13 +23,32 @@ class FlashBag implements ParameterBagInterface
         }
     }
 
-    public function get($key, $default = null)
+    public function get($key, $default = null, $remove = false)
     {
         $flashes = $this->all();
         $flashMessage = array_key_exists($key, $flashes) ? $flashes[$key] : $default;
-        $this->remove($key);
+
+        if ($remove) {
+            $this->remove($key);
+        }
 
         return $flashMessage;
+    }
+
+    public function all($remove = false)
+    {
+        $flashes = $this->session->get(self::FLASHBAG_SESSION_KEY, array());
+        if ($remove) {
+            $this->session->remove(self::FLASHBAG_SESSION_KEY);
+        }
+        return $flashes;
+    }
+
+    public function remove($key)
+    {
+        $flashes = $this->all();
+        unset($flashes[$key]);
+        $this->session->set(self::FLASHBAG_SESSION_KEY, $flashes);
     }
 
     public function has($key)
@@ -42,17 +61,5 @@ class FlashBag implements ParameterBagInterface
     {
         $flashes = $this->all();
         $this->session->set(self::FLASHBAG_SESSION_KEY, array_merge($flashes, array($key => $value)));
-    }
-
-    public function remove($key)
-    {
-        $flashes = $this->all();
-        unset($flashes[$key]);
-        $this->session->set(self::FLASHBAG_SESSION_KEY, $flashes);
-    }
-
-    public function all()
-    {
-        return $this->session->get(self::FLASHBAG_SESSION_KEY, array());
     }
 }
