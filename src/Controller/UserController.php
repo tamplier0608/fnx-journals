@@ -56,6 +56,20 @@ class UserController extends Controller
         ));
     }
 
+    public function isLoggedUser()
+    {
+        return $this->getRequest()->session->has('user');
+    }
+
+    protected function isLoginFormValid($data)
+    {
+        if (empty($data['username']) || empty($data['password'])) {
+            $this->getView()->assign('error', 'Incorrect input data.');
+            return false;
+        }
+        return true;
+    }
+
     public function logoutAction()
     {
         $request = $this->getRequest();
@@ -67,15 +81,6 @@ class UserController extends Controller
         $request->session->remove('user');
 
         return $this->redirect($referer);
-    }
-
-    protected function isLoginFormValid($data)
-    {
-        if (empty($data['username']) || empty($data['password'])) {
-            $this->getView()->assign('error', 'Incorrect input data.');
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -118,7 +123,7 @@ class UserController extends Controller
 
         if ($isInCollection) {
             $request->session->getFlashBag()->set('warning', 'You\'ve already purchased this article. You can always find it in your collection.');
-            $url = $request->session->has('article_url') ? $request->session->get('article_url') : $this->getView()->baseUrl();
+            $url = $request->session->has('article_url') ? $request->session->get('article_url') : $baseUrl();
             return $this->redirect($url);
         }
 
@@ -180,12 +185,6 @@ class UserController extends Controller
             'orders' => $orders,
             'user' => $user
         ));
-    }
-
-    public function isLoggedUser()
-    {
-        $isLoggedUser = $this->getRequest()->session->has('user');
-        return $isLoggedUser;
     }
     
     
