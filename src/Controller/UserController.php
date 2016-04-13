@@ -214,12 +214,13 @@ class UserController extends Controller
         if ($this->isLoggedUser()) {
             $user = $this->getRequest()->session->get('user');
 
-            $db = $this->application->getResource('db');
             $deleteQuery = <<<SQL
               DELETE FROM orders
               WHERE orders.customerId = ?
 SQL;
-            $sth = $db->exec($deleteQuery, array($user->userId));
+            $sth = $this->application
+                ->getResource('db')
+                ->exec($deleteQuery, array($user->userId));
 
             if ($sth instanceof \PDOStatement) {
                 $this->getRequest()->session->getFlashBag()->set('success', 'Users collection was successfully cleaned up.');
