@@ -25,11 +25,6 @@
             <div class="header clearfix">
                 <nav>
                     <ul class="nav nav-pills pull-right">
-                        <?php if ($isLoggedUser): ?>
-                        <li role="presentation">
-                            <span class="amount"><i class="glyphicon glyphicon-usd"></i><?=$this->escape($user->wallet);?></span>
-                        </li>
-                        <?php endif; ?>
                         <li role="presentation">
                             <?php if ($isLoggedUser): ?>
                             <div class="dropdown">
@@ -37,7 +32,8 @@
                                     <i class="glyphicon glyphicon-user"></i> <?=$this->escape($user->username)?>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <ul class="dropdown-menu right" aria-labelledby="dropdownMenu1">
+                                    <li><a href="javascript:void(0)">Wallet:<i class="glyphicon glyphicon-usd"></i><?=$this->escape($user->wallet)?></a></li>
                                     <li><a href="<?=$this->baseUrl()?>/user/collection">Collection</a></li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="<?=$this->baseUrl()?>/logout">Logout</a></li>
@@ -53,7 +49,6 @@
             </div>
 
             <main class="col-sm-9">
-
                 <?php if (isset($flashBag) && count($flashBag->all())): ?>
                     <?php foreach ($flashBag->all($remove = true) as $key => $flash): ?>
                     <div class="alert alert-<?=$key?> alert-dismissable" role="alert">

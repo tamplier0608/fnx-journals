@@ -111,3 +111,11 @@ span.amount { position: absolute;
   /* Remove the bottom border on the jumbotron for visual effect */
   .jumbotron { border-bottom: 0; }
 }
+
+@media screen and (max-width: 639px) {
+  table {
+    display: -moz-box;
+    display: -webkit-box;
+    overflow: auto;
+  }
+}
