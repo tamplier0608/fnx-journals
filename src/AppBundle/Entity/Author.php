@@ -1,14 +1,14 @@
 <?php
 
-namespace Entity;
+namespace AppBundle\Entity;
 
-use Core\Db\Row;
+use Core\Db\Entity;
 
 /**
  * Class Articles
  * @package Entity
  */
-class Author extends Row
+class Author extends Entity
 {
     protected static $table = 'authors';
     protected static $primaryKey = 'authorId';

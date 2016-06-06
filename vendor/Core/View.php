@@ -9,25 +9,27 @@ namespace Core;
 class View
 {
     /**
+     * @var array Directory paths for helper view classes
+     */
+    public static $helperPaths = array('Core/View/helpers');
+    /**
      * @var Directory path where templates are placed
      */
     protected $templatesPath;
-
     /**
      * @var array Params assigned to template
      */
     protected $params;
 
-    /**
-     * @var array Directory paths for helper view classes
-     */
-    protected $helperPaths;
-
     public function __construct($templatesPath)
     {
         $this->templatesPath = rtrim($templatesPath);
         $this->params = array();
-        $this->helperPaths = array('Core/View/helpers');
+    }
+
+    public static function addHelperPath($helperPath)
+    {
+        static::$helperPaths[] = $helperPath;
     }
 
     /**
@@ -41,6 +43,17 @@ class View
     {
         $this->params[$key] = $value;
         return $this;
+    }
+
+    /**
+     * Render template
+     *
+     * @param $template
+     * @param array $params
+     */
+    public function render($template, array $params = array())
+    {
+        echo $this->fetch($template, $params);
     }
 
     /**
@@ -62,17 +75,6 @@ class View
     }
 
     /**
-     * Render template
-     *
-     * @param $template
-     * @param array $params
-     */
-    public function render($template, array $params = array())
-    {
-        echo $this->fetch($template, $params);
-    }
-
-    /**
      * @param string $method
      * @param array $params
      * @return mixed
@@ -81,8 +83,9 @@ class View
     {
         $helperClass = ucfirst($method);
 
-        foreach ($this->helperPaths as $path) {
-            $helperClass = str_replace('/', '\\', $path . '/' . $helperClass);
+        foreach (static::$helperPaths as $path) {
+            $helperClass = str_replace('/', '\\', $path . '/' . ucfirst($method));
+
             if (class_exists($helperClass)) {
                 break;
             }

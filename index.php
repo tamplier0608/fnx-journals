@@ -1,5 +1,12 @@
 <?php
 
+function d($var)
+{
+    echo '<pre>';
+    var_dump($var);
+    echo '</pre>';
+}
+
 phpversion() > '5.4.*' || die('Application requires PHP version 5.4 or higher');
 
 defined('ENV') || define('ENV', 'dev');

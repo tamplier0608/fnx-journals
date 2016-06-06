@@ -1,6 +1,6 @@
 <?php
 
-namespace Entity\Repository;
+namespace AppBundle\Entity\Repository;
 
 use Core\Db\Repository;
 
@@ -11,15 +11,16 @@ use Core\Db\Repository;
 class Articles extends Repository
 {
     protected static $table = 'articles';
-    protected static $rowClass = 'Entity\Article';
+    protected static $primaryKey = 'articleId';
+    protected static $rowClass = 'AppBundle\Entity\Article';
 
     /**
      * @inheritdoc
      */
-    public function buildFetchAllQuery($fields, $limit = false)
+    public function buildFetchAllQuery($limit = false, $orderBy = false)
     {
         $sql = <<<SQL
-            SELECT {$fields} FROM `articles` art
+            SELECT * FROM `articles` art
             LEFT JOIN `categories` cat ON art.categoryId = cat.categoryId
 SQL;
 
@@ -53,9 +54,9 @@ SQL;
         return $sql;
     }
 
-    public function fetchAllByCategory($categoryId, $limit = false)
+    public function fetchAllByCategory($categoryId, $limit = false, $orderBy = false)
     {
-        $sql = $this->buildFetchAllByCategoryQuery($limit);
+        $sql = $this->buildFetchAllByCategoryQuery($limit, $orderBy);
         $sth = $this->executeQuery($sql, array($categoryId));
         $rowSet = $this->fetchResultInRowset($sth);
 
@@ -67,17 +68,17 @@ SQL;
      * @param string|array $fields
      * @return string
      */
-    protected function buildFetchAllByCategoryQuery($limit = false, $fields = '*')
+    protected function buildFetchAllByCategoryQuery($limit = false, $orderBy = false)
     {
-        if (is_array($fields) && count($fields)) {
-            $fields = implode(',', $fields);
-        }
-
         $sql = <<<SQL
-          SELECT {$fields} FROM articles art 
+          SELECT * FROM articles art 
           JOIN categories cat ON art.categoryId = cat.categoryId 
           WHERE cat.categoryId = ?
 SQL;
+        if (false !== $orderBy) {
+            $sql .= ' ORDER BY ' . $orderBy;
+        }
+
         if (false !== $limit) {
             $sql .= ' LIMIT ' . $limit;
         }
@@ -85,9 +86,41 @@ SQL;
         return $sql;
     }
 
+    public function fetchAllByTag($tagId, $limit = false, $orderBy = false)
+    {
+        $query = $this->builFetchAllByTagQuery($limit, $orderBy);
+        $sth = $this->executeQuery($query, array($tagId));
+        return $this->fetchResultInRowset($sth);
+    }
+
+    protected function builFetchAllByTagQuery($limit = false, $orderBy = false)
+    {
+        $query = <<<SQL
+          SELECT * FROM articles art
+          JOIN articles_tags a_t ON art.articleId = a_t.articleId
+          WHERE a_t.tagId = ?
+SQL;
+
+
+        if (false !== $orderBy) {
+            $query .= ' ORDER BY ' . $orderBy;
+        }
+
+        if (false !== $limit) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        return $query;
+    }
+
     public function countAllInCategory($categoryId)
     {
-        $sql = $this->buildFetchAllByCategoryQuery(false, 'COUNT(*) as count');
+        $sql = <<<SQL
+          SELECT COUNT(*) as count FROM articles art
+          JOIN articles_tags a_t ON art.articleId = a_t.articleId
+          WHERE a_t.tagId = ?
+SQL;
+
         $sth = $this->executeQuery($sql, array($categoryId));
 
         return $sth->fetch(\PDO::FETCH_ASSOC)['count'];

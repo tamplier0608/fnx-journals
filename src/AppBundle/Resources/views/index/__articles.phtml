@@ -1,5 +1,5 @@
-<?php if ($pagination['countAll']): ?>
-    <?php foreach ($pagination['data'] as $article): ?>
+<?php if (count($articles)): ?>
+    <?php foreach ($articles as $article): ?>
         <article>
             <h2><?=$this->escape($article->title)?></h2>
             <section class="short-desc">
@@ -13,7 +13,7 @@
                     <?php endforeach; ?>
                 <?php endif; ?> |
 
-                <?php if (!empty($article->category)): ?>
+                <?php if ($article->category): ?>
                     <i class="glyphicon glyphicon-folder-close"></i>
                     <a href="<?=$this->baseUrl()?>/category/<?=$article->category->categoryId?>"><?=$this->escape($article->category->name)?></a> |
                 <?php endif; ?>
@@ -21,7 +21,7 @@
                 <?php if (count($article->tags)): $counter = 1;?>
                     <i class="glyphicon glyphicon-tag"></i>
                     <?php foreach ($article->tags as $tag): ?>
-                        <?=$this->escape($tag->tagName)?><?php if ($counter != count($article->tags)) { echo ','; $counter++; } ?>
+                    <a href="<?=$this->baseUrl()?>/tag/<?=$tag->tagId?>"><?=$this->escape($tag->tagName)?><?php if ($counter != count($article->tags)) { echo ','; $counter++; } ?></a>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </section>
@@ -30,25 +30,11 @@
             </div>
             <?php if ($article->price == 0): ?>
                 <div class="remark free">FREE for logged!</div>
-            <?php elseif ($isLoggedUser && $article->isPurchased):  ?>
+            <?php elseif ($this->isLoggedUser() && $this->isArticlePurchasedByUser($article->articleId, $this->getUser()->userId)):  ?>
                 <div class="remark purchased">In collection</div>
             <?php endif; ?>
         </article>
     <?php endforeach; ?>
-
-    <?php if ($pagination['countPages'] > 1): ?>
-    <nav class="paginaton">
-        <?php if ($pagination['prev']): ?>
-        <a class="btn btn-default pull-left" href="?page=<?=$pagination['prev']?>">&laquo; Prev</a>
-        <?php endif; ?>
-
-        <?php if ($pagination['next']): ?>
-        <a class="btn btn-default pull-right" href="?page=<?=$pagination['next']?>">Next &raquo;</a>
-        <?php endif; ?>
-        <div class="clearfix"></div>
-    </nav>
-    <?php endif; ?>
-
 <?php else: ?>
     <p>There are no articles.</p>
 <?php endif; ?>

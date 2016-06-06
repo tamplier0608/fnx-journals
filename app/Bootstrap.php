@@ -21,8 +21,8 @@ class Bootstrap extends BootstrapAbstract
     {
         $dbAdapter = new \Core\Db($this->application->getResource('appConfig')['db']);
 
-        Core\Db\Row::setDefaultDbAdapter($dbAdapter);
-        Core\Db\Repository::setDefaultDbAdapter($dbAdapter);
+        Core\Db\Entity::setDefaultDbConnection($dbAdapter);
+        Core\Db\Repository::setDefaultDbConnection($dbAdapter);
 
         $this->application->addResource('db', $dbAdapter);
     }
@@ -32,10 +32,15 @@ class Bootstrap extends BootstrapAbstract
         Core\Session::start();
     }
 
+    public function __initViewHelperPaths()
+    {
+        View::addHelperPath('AppBundle\View\helpers');
+    }
+
     public function __initLayout()
     {
         $appConfig = $this->application->getResource('appConfig');
-        $request = \Core\Request::createFromGlobals();
+        $request = Core\Request::createFromGlobals();
 
         if (
             !empty($appConfig['layout']) &&
@@ -53,14 +58,6 @@ class Bootstrap extends BootstrapAbstract
             $layout->head()->addScript($baseUrl . '/assets/js/jquery.js');
             $layout->head()->addScript($baseUrl . '/assets/js/bootstrap.min.js');
 
-            # init layout variables
-            $isLoggedUser = false;
-            if ($request->session->has('user')) {
-                $layout->assign('user', $request->session->get('user'));
-                $isLoggedUser = true;
-            }
-            $layout->assign('isLoggedUser', $isLoggedUser);
-
             # set data for list of categories in sidebar
             $categories = $this->getCategoryList();
             $layout->assign('categories', $categories);
@@ -68,6 +65,10 @@ class Bootstrap extends BootstrapAbstract
             # set data for list of authors in sidebar
             $authors = $this->getAuthorList();
             $layout->assign('authors', $authors);
+
+            # set data for list of tags in sidebar
+            $tags = $this->getTagList();
+            $layout->assign('tags', $tags);
 
             # set flashes
             $layout->assign('flashBag', $request->session->getFlashBag());
@@ -81,16 +82,20 @@ class Bootstrap extends BootstrapAbstract
      */
     public function getCategoryList()
     {
-        $categoryRepository = new \Entity\Repository\Categories();
-        $categories = $categoryRepository->getList();
-        return $categories;
+        $categoryRepository = new AppBundle\Entity\Repository\Categories();
+        return $categoryRepository->getList();
     }
 
     public function getAuthorList()
     {
-        $authorRepository = new \Entity\Repository\Authors();
-        $authors = $authorRepository->fetchAll();
-        return $authors;
+        $authorRepository = new AppBundle\Entity\Repository\Authors();
+        return $authorRepository->fetchAll();
+    }
+
+    public function getTagList()
+    {
+        $tagRepository = new AppBundle\Entity\Repository\Tags();
+        return $tagRepository->getList();
     }
 
     public function __initView()

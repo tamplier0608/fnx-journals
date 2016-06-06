@@ -95,6 +95,17 @@ span.amount { position: absolute;
   color: initial;
 }
 
+.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tags li {
+  float: left;
+  padding: 0 5px;
+}
+
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
   /* Remove the padding we set earlier */

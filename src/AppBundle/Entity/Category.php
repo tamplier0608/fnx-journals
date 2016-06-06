@@ -1,14 +1,14 @@
 <?php
 
-namespace Entity;
+namespace AppBundle\Entity;
 
-use Core\Db\Row;
+use Core\Db\Entity;
 
 /**
  * Class Articles
  * @package Entity
  */
-class Category extends Row
+class Category extends Entity
 {
     protected static $table = 'categories';
     protected static $primaryKey = 'categoryId';

@@ -3,7 +3,6 @@
 namespace Core;
 
 use Core\Db\Error;
-use Core\Registry;
 
 class Db
 {
@@ -76,6 +75,16 @@ class Db
     }
 
     /**
+     * Get error object
+     *
+     * @return Error
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
      * Set SQL error object
      *
      * @param Error $error
@@ -86,16 +95,6 @@ class Db
         $this->error = $error;
 
         return $this;
-    }
-
-    /**
-     * Get error object
-     *
-     * @return Error
-     */
-    public function getError()
-    {
-        return $this->error;
     }
 
     /**

@@ -8,7 +8,7 @@ use Core\Db;
  * Class Row
  * @package Core\Db
  */
-abstract class Row
+abstract class Entity implements \ArrayAccess
 {
     /**
      * @var Table name
@@ -18,12 +18,14 @@ abstract class Row
     /**
      * @var Database adapter object
      */
-    protected static $db;
+    protected static $conn;
 
     /**
      * @var string Primary keys name
      */
     protected static $primaryKey = 'id';
+
+    protected static $avoidSaving = array();
 
     public function __construct($id = null)
     {
@@ -45,7 +47,7 @@ abstract class Row
     protected function fetch()
     {
         $query = $this->buildFetchQuery();
-        $sth = self::getDbAdapter()->exec($query, array($this->{static::$primaryKey}));
+        $sth = self::getDbConnection()->exec($query, array($this->{static::$primaryKey}));
 
         if (!$sth instanceof \PDOStatement) {
             return false;
@@ -62,11 +64,11 @@ abstract class Row
         return $query;
     }
 
-    public static function getDbAdapter() {
-        if (null === static::$db) {
+    public static function getDbConnection() {
+        if (null === static::$conn) {
             throw new \RuntimeException('Database adapter is not set!');
         }
-        return static::$db;
+        return static::$conn;
     }
 
     /**
@@ -83,9 +85,9 @@ abstract class Row
         }
     }
 
-    public static function setDefaultDbAdapter(Db $db)
+    public static function setDefaultDbConnection(Db $conn)
     {
-        static::$db = $db;
+        static::$conn = $conn;
     }
 
     /**
@@ -94,6 +96,12 @@ abstract class Row
      */
     public function __get($field)
     {
+        $method = 'get' . ucfirst($field);
+
+        if (method_exists($this, $method)) {
+            return $this->{$method}();
+        }
+
         if (isset($this->{$field})) {
             return $this->{$field};
         }
@@ -108,6 +116,13 @@ abstract class Row
      */
     public function __set($field, $value)
     {
+        $method = 'set' . ucfirst($field);
+
+        if (method_exists($this, $method)) {
+            $this->{$method}($value);
+            return;
+        }
+
         $this->{$field} = $value;
 
         return $this;
@@ -130,7 +145,7 @@ abstract class Row
     public function delete()
     {
         $query = $this->buildDeleteQuery();
-        $sth = static::getDbAdapter()->exec($query, array($this->{static::$primaryKey}));
+        $sth = static::getDbConnection()->exec($query, array($this->{static::$primaryKey}));
 
         if (!$sth instanceof \PDOStatement) {
             return false;
@@ -157,9 +172,12 @@ abstract class Row
     {
         $sql = $this->buildSaveQuery();
 
-        $result = static::getDbAdapter()->exec($sql);
+        $params = array_values($this->getPublicVars());
+        $params = array_merge($params, $params); # there are two parts of query with the same params here
 
-        if (!$result instanceof \PDOStatement) {
+        $result = static::getDbConnection()->exec($sql, $params);
+
+        if (!$result instanceof PDOStatement) {
             return false;
         }
 
@@ -179,8 +197,8 @@ abstract class Row
 
         foreach ($this->getPublicVars() as $field => $value) {
             $fields[] = $field;
-            $params[] = $field . '= "' . $value . '"';
-            $values[] = '"' . $value . '"';
+            $params[] = $field . ' = ?';
+            $values[] = '?';
         }
 
         $query .= ' (' . implode(',', $fields) . ') VALUES (' . implode(',', $values) . ') ';
@@ -192,9 +210,17 @@ abstract class Row
     protected function getPublicVars()
     {
         $me = $this;
+        $avoid = static::$avoidSaving;
 
-        $vars = function () use ($me) {
-            return get_object_vars($me);
+        $vars = function () use ($me, $avoid) {
+            $vars = get_object_vars($me);
+
+            foreach ($vars as $key => $value) {
+                if (in_array($key, $avoid)) {
+                    unset($vars[$key]);
+                }
+            }
+            return $vars;
         };
 
         return $vars();
@@ -207,7 +233,7 @@ abstract class Row
      */
     public function getLastError()
     {
-        return static::getDbAdapter()->getError();
+        return static::getDbConnection()->getError();
     }
 
     /**
@@ -219,5 +245,39 @@ abstract class Row
         $this->fill($fields);
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetExists($offset)
+    {
+        $vars = $this->getPublicVars();
+        return array_key_exists($offset, $vars);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetGet($offset)
+    {
+        $vars = $this->getPublicVars();
+        return isset($vars[$offset]) ? $vars[$offset] : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->{$offset} = $value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->{$offset});
     }
 }

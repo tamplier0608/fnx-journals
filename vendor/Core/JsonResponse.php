@@ -7,18 +7,18 @@ use Core\Response\ResponseInterface;
  * Class Response
  * @package vendor\Core
  */
-class Response implements ResponseInterface
+class JsonResponse implements ResponseInterface
 {
     protected $content;
     protected $statusCode;
 
-    public function __construct($content = '', $statusCode = 200)
+    public function __construct(array $content = array(), $statusCode = 200)
     {
         $this->setContent($content);
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getContent()
     {
@@ -26,9 +26,9 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param mixed $content
+     * @param array $content
      */
-    public function setContent($content)
+    public function setContent(array $content)
     {
         $this->content = $content;
     }
@@ -40,6 +40,6 @@ class Response implements ResponseInterface
 
     public function sendContent()
     {
-        echo $this->content;
+        echo json_encode($this->content);
     }
 }

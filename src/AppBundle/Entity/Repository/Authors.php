@@ -1,6 +1,6 @@
 <?php
 
-namespace Entity\Repository;
+namespace AppBundle\Entity\Repository;
 
 use Core\Db\Repository;
 
@@ -8,10 +8,11 @@ use Core\Db\Repository;
  * Class Articles
  * @package Entity\Repository
  */
-class Tags extends Repository
+class Authors extends Repository
 {
-    protected static $table = 'tags';
-    protected static $rowClass = 'Entity\Tag';
+    protected static $table = 'authors';
+    protected static $primaryKey = 'authorId';
+    protected static $rowClass = 'AppBundle\Entity\Author';
 
     public function fetchAllByArticle($articleId)
     {
@@ -25,11 +26,11 @@ class Tags extends Repository
     protected function buildFetchAllByArticleQuery()
     {
         $sql = <<<SQL
-            SELECT * FROM `tags` 
-            JOIN `articles_tags` a_t ON tags.tagId = a_t.tagId 
-            WHERE a_t.articleId = ?;
+            SELECT * FROM `authors`
+            JOIN `articles_authors` a_u ON `authors`.`authorId` = a_u.`authorId`
+            WHERE a_u.`articleId` = ?;
 SQL;
-
+        
         return $sql;
     }
 }

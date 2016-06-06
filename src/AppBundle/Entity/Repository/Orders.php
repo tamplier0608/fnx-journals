@@ -1,6 +1,6 @@
 <?php
 
-namespace Entity\Repository;
+namespace AppBundle\Entity\Repository;
 
 use Core\Db\Repository;
 
@@ -11,7 +11,8 @@ use Core\Db\Repository;
 class Orders extends Repository
 {
     protected static $table = 'orders';
-    protected static $rowClass = 'Entity\Order';
+    protected static $primaryKey = 'orderId';
+    protected static $rowClass = 'AppBundle\Entity\Order';
 
     public function fetchAllByUser($userId)
     {

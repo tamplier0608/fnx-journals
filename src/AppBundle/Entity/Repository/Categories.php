@@ -1,6 +1,6 @@
 <?php
 
-namespace Entity\Repository;
+namespace AppBundle\Entity\Repository;
 
 use Core\Db\Repository;
 
@@ -11,7 +11,8 @@ use Core\Db\Repository;
 class Categories extends Repository
 {
     protected static $table = 'categories';
-    protected static $rowClass = 'Entity\Category';
+    protected static $primaryKey = 'categoryId';
+    protected static $rowClass = 'AppBundle\Entity\Category';
 
     public function getList()
     {

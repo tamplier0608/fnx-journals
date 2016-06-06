@@ -1,14 +1,14 @@
 <?php
 
-namespace Controller;
+namespace AppBundle\Controller;
 
+use AppBundle\Entity\Article;
+use AppBundle\Entity\Order;
+use AppBundle\Entity\Repository\Orders as OrderRepository;
+use AppBundle\Entity\Repository\Users as UserRepository;
 use Core\Application\Controller;
 use Core\Auth\Adapter\DbTable;
 use Core\Auth\Auth;
-use Entity\Article;
-use Entity\Order;
-use Entity\Repository\Orders as OrderRepository;
-use Entity\Repository\Users as UserRepository;
 
 class UserController extends Controller
 {

@@ -21,14 +21,14 @@ return array(
         'uri' => 'index/authorPage/$1'
     ),
     
-    'category_list' => array(
-        'pattern' => 'categories/?',
-        'uri' => 'index/categoryList'
-    ),
-    
     'category_page' => array(
         'pattern' => 'category/([\d]+)/?',
         'uri' => 'index/categoryPage/$1'
+    ),
+
+    'tag_page' => array(
+        'pattern' => 'tag/([\d+])/?',
+        'uri' => 'index/tagPage/$1'
     ),
 
     'login' => array(
@@ -49,6 +49,16 @@ return array(
     'buy_article' => array(
         'pattern' => 'user/buy/([\d+])/?',
         'uri' => 'user/buy/$1'
+    ),
+
+    'add_comment' => array(
+        'pattern' => 'comment/new/?',
+        'uri' => 'index/addComment'
+    ),
+
+    'load_comments' => array(
+        'pattern' => 'comment/load/?',
+        'uri' => 'index/loadComments'
     ),
 
     # for test purposes

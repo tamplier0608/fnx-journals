@@ -1,6 +1,6 @@
 <?php
 
-namespace Entity\Repository;
+namespace AppBundle\Entity\Repository;
 
 use Core\Db\Repository;
 
@@ -11,7 +11,8 @@ use Core\Db\Repository;
 class Users extends Repository
 {
     protected static $table = 'users';
-    protected static $rowClass = 'Entity\User';
+    protected static $rowClass = 'AppBundle\Entity\User';
+    protected static $primaryKey = 'userId';
 
     public function fetchOneByUsername($articleId)
     {
@@ -39,7 +40,7 @@ SQL;
             WHERE art.articleId = ?
             AND ord.customerId = ?
 SQL;
-        $sth = self::getDbAdapter()->exec($sql, array($articleId, $userId));
+        $sth = self::getDbConnection()->exec($sql, array($articleId, $userId));
 
         if (!$sth instanceof \PDOStatement) {
             return false;

@@ -11,7 +11,6 @@ $I->see('Username');
 $I->see('Password');
 $I->see('', '.login');
 
-$I->
 $I->fillField('Username', 'test-user1');
 $I->click('Sign in');
 $I->seeCurrentUrlEquals('/fnx-journals/login');
@@ -28,5 +27,3 @@ $I->fillField('Password', 'test-user1');
 $I->click('Sign in');
 $I->expectTo('redirect to home page');
 $I->seeCurrentUrlEquals('/fnx-journals/');
-
-$I->seeInDatabase('orders', array('customerId' => 1));

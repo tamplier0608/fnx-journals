@@ -32,17 +32,6 @@ class Application implements \ArrayAccess
     }
 
     /**
-     * Get resource by identifier
-     *
-     * @param string $identifier
-     * @return mixed
-     */
-    public function getResource($identifier)
-    {
-        return $this->offsetGet($identifier);
-    }
-
-    /**
      * Adds resource to app registry
      *
      * @param string $identifier Name of resource which it will be resigered in registry
@@ -56,12 +45,53 @@ class Application implements \ArrayAccess
     }
 
     /**
+     * @inheritdoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->registry[$offset] = $value;
+    }
+
+    /**
+     * Get resource by identifier
+     *
+     * @param string $identifier
+     * @return mixed
+     */
+    public function getResource($identifier)
+    {
+        return $this->offsetGet($identifier);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetGet($offset)
+    {
+        if (isset($this->registry[$offset])) {
+            return $this->registry[$offset];
+        }
+        return false;
+    }
+
+    /**
      * @param string $identifier
      * @return bool
      */
     public function hasResourse($identifier)
     {
         return $this->offsetExists($identifier);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function offsetExists($offset)
+    {
+        if (isset($this->registry[$offset])) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -142,14 +172,13 @@ class Application implements \ArrayAccess
         return $uri;
     }
 
-
     /**
      * @param $controller
      * @return string
      */
     public function buildControllerClassName($controller)
     {
-        $controllerClass = 'Controller\\' . ucfirst($controller) . 'Controller';
+        $controllerClass = 'AppBundle\\Controller\\' . ucfirst($controller) . 'Controller';
         return $controllerClass;
     }
 
@@ -186,36 +215,6 @@ class Application implements \ArrayAccess
         }
 
         return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function offsetExists($offset)
-    {
-        if (isset($this->registry[$offset])) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function offsetGet($offset)
-    {
-        if (isset($this->registry[$offset])) {
-            return $this->registry[$offset];
-        }
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->registry[$offset] = $value;
     }
 
     /**

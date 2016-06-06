@@ -16,7 +16,7 @@ return array(
     ),
 
     'view' => array(
-        'path' => DOCUMENT_ROOT . '/src/Resources/views/'
+        'path' => DOCUMENT_ROOT . '/src/AppBundle/Resources/views/'
     ),
 
     'assets' => array(

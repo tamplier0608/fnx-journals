@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    
+
     'application_path' => DOCUMENT_ROOT . '/app/',
     'source_path' => DOCUMENT_ROOT . '/src/',
 
@@ -16,7 +16,7 @@ return array(
     ),
 
     'view' => array(
-        'path' => DOCUMENT_ROOT . '/src/Resources/views/'
+        'path' => DOCUMENT_ROOT . '/src/AppBundle/Resources/views/'
     ),
 
     'assets' => array(
@@ -25,10 +25,10 @@ return array(
 
     'db' => array(
         'adapter' => 'mysql',
-        'host' => 'localhost',
-        'dbname' => 'fnx_journals',
-        'username' => 'webuser',
-        'password' => 'webuserpassword',
+        'host' => 'db15.freehost.com.ua',
+        'dbname' => 'vseoweb_journals',
+        'username' => 'vseoweb_journals',
+        'password' => 'K5xijeWPp',
         'charset' => 'utf8',
         'crypt_salt' => 'sdfksadks$$kmfasd$fsdfjkhl;k!',
     ),

@@ -10,41 +10,70 @@ use Core\Db;
 abstract class Repository
 {
     protected static $table;
+    protected static $primaryKey = 'id';
     protected static $rowClass;
 
-    protected static $db;
+    protected static $conn;
 
     public static function beginTransaction()
     {
-        static::$db->exec('BEGIN TRANSACTION;');
+        static::getDbConnection()->exec('BEGIN;');
+    }
+
+    public static function getDbConnection() {
+        if (null === static::$conn) {
+            throw new \RuntimeException('Database adapter is not set!');
+        }
+        return static::$conn;
     }
 
     public static function commitTransaction()
     {
-        static::$db->exec('COMMIT');
+        static::getDbConnection()->exec('COMMIT');
     }
 
     public static function rollbackTransaction()
     {
-        static::$db->exec('ROLLBACK;');
+        static::getDbConnection()->exec('ROLLBACK;');
     }
 
-    public static function setDefaultDbAdapter(Db $db)
+    public static function setDefaultDbConnection(Db $conn)
     {
-        static::$db = $db;
+        static::$conn = $conn;
     }
 
-    public static function getDbAdapter() {
-        if (null === static::$db) {
-            throw new \RuntimeException('Database adapter is not set!');
+    /**
+     * @param bool|string $limit
+     * @param string|array $fields
+     * @return mixed
+     */
+    public function fetchAll($limit = false, $orderBy = false)
+    {
+        $sql = $this->buildFetchAllQuery($limit, $orderBy);
+        $sth = $this->executeQuery($sql);
+        $rowSet = $this->fetchResultInRowset($sth);
+
+        return $rowSet;
+    }
+
+    /**
+     * @param string $limit
+     * @param string $orderBy
+     * @return mixed
+     */
+    protected function buildFetchAllQuery($limit = false, $orderBy = false)
+    {
+        $sql = 'SELECT * FROM `' . static::$table . '`';
+
+        if ($orderBy) {
+            $sql .= ' ORDER BY ' . $orderBy;
         }
-        return static::$db;
-    }
 
-    public function countAll()
-    {
-        $sth = $this->executeQuery('SELECT COUNT(*) as count FROM ' . static::$table);
-        return $sth->fetch(\PDO::FETCH_ASSOC)['count'];
+        if (false !== $limit) {
+            $sql .= ' LIMIT ' . $limit;
+        }
+
+        return $sql;
     }
 
     /**
@@ -53,44 +82,12 @@ abstract class Repository
      */
     protected function executeQuery($sql, $params = array())
     {
-        $sth = static::$db->exec($sql, $params);
+        $sth = static::getDbConnection()->exec($sql, $params);
 
         if (!$sth instanceof \PDOStatement) {
             throw new \RuntimeException("Error in SQL statement: '$sql'. " . __CLASS__ );
         }
         return $sth;
-    }
-
-    /**
-     * @param bool|string $limit
-     * @param string|array $fields
-     * @return mixed
-     */
-    public function fetchAll($limit = false, $fields = '*')
-    {
-        if (is_array($fields) && count($fields)) {
-            $fields = implode(',', $fields);
-        }
-        $sql = $this->buildFetchAllQuery($fields, $limit);
-        $sth = $this->executeQuery($sql);
-        $rowSet = $this->fetchResultInRowset($sth);
-
-        return $rowSet;
-    }
-
-    /**
-     * @param $fields
-     * @param $limit
-     * @return mixed
-     */
-    protected function buildFetchAllQuery($fields, $limit)
-    {
-        $sql = 'SELECT ' . $fields . ' FROM `' . static::$table . '`';
-        if (false !== $limit) {
-            $sql .= ' LIMIT ' . $limit;
-        }
-
-        return $sql;
     }
 
     /**
@@ -105,5 +102,67 @@ abstract class Repository
             $rowSet[] = $row;
         }
         return $rowSet;
+    }
+
+    /**
+     * @param $id
+     * @return Core/Db/Entity
+     */
+    public function find($id)
+    {
+        $query = 'SELECT * FROM ' . static::$table . ' WHERE ' . static::$primaryKey . ' = ?';
+        $sth = $this->executeQuery($query, array($id));
+
+        return $sth->fetchObject(static::$rowClass);
+    }
+
+    public function countAll(array $conditions = array(), array $params = array())
+    {
+        $query = 'SELECT COUNT(*) as count FROM ' . static::$table;
+        $query = $this->prepareConditions($conditions, $query);
+
+        return $this->executeQuery($query, $params)->fetch()['count'];
+    }
+
+    /**
+     * @param array $conditions
+     * @param $query
+     * @return string
+     */
+    protected function prepareConditions(array $conditions, $query)
+    {
+        $countConditions = count($conditions);
+
+        if ($countConditions) {
+            for ($i = 0; $i < $countConditions; $i++) {
+                if ($i === 0) {
+                    $query .= ' WHERE ';
+                } else {
+                    $query .= ' AND ';
+                }
+                $query .= $conditions[$i];
+            }
+            return $query;
+        }
+        return $query;
+    }
+
+    public function findBy(array $conditions = array(), array $params = array(), $limit = false, $orderBy = false)
+    {
+        $query = $this->buildFetchAllQuery();
+
+        $query = $this->prepareConditions($conditions, $query);
+
+        if (false !== $orderBy) {
+            $query .= ' ORDER BY ' . $orderBy;
+        }
+
+        if (false !== $limit) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        $sth = $this->executeQuery($query, $params);
+
+        return $this->fetchResultInRowset($sth);
     }
 }

@@ -10,6 +10,7 @@ class Request
 {
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
+    const METHOD_XMLHTTPREQUEST = 'XMLHttpRequest';
 
     public $query;
     public $post;
@@ -43,11 +44,10 @@ class Request
         return $this->server->get('REQUEST_METHOD') === self::METHOD_POST;
     }
 
-    public function getUri()
+    public function isXmlHttpRequest()
     {
-        return $this->server->get('REQUEST_URI');
+        return $this->server->get('HTTP_X_REQUESTED_WITH') === self::METHOD_XMLHTTPREQUEST;
     }
-
 
     public function getBaseUrl()
     {
@@ -64,11 +64,16 @@ class Request
 
         # looking for common parts in script path and URI
         foreach ($uriSegments as $segment) {
-            if ($segment == array_shift($scriptPathSegments)) {
+            if ($segment === array_shift($scriptPathSegments)) {
                 $common[] = $segment;
             }
         }
 
         return '/' . implode('/', $common);
+    }
+
+    public function getUri()
+    {
+        return $this->server->get('REQUEST_URI');
     }
 }
