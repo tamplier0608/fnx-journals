@@ -4,13 +4,16 @@ namespace Core\View\helpers;
 
 class Head
 {
+    protected static $instance;
     protected $styles = array();
     protected $scripts = array();
-    
     protected $title = '';
-    
-    protected static $instance;
 
+    public function head()
+    {
+        return self::getInstance();
+    }
+    
     public static function getInstance()
     {
         if (null === self::$instance) {
@@ -18,11 +21,6 @@ class Head
         }
 
         return self::$instance;
-    }
-    
-    public function head()
-    {
-        return self::getInstance();
     }
     
     public function __toString() 
@@ -35,15 +33,6 @@ class Head
         return $echo;
     }
     
-    public function getScripts()
-    {
-        $echo = '';
-        foreach ($this->scripts as $style) {
-            $echo .= $style ;
-        }
-        return $echo;
-    }
-    
     public function getStylesheets()
     {
         $echo = '';
@@ -52,8 +41,16 @@ class Head
         }
         return $echo;
     }
-
     
+    public function getScripts()
+    {
+        $echo = '';
+        foreach ($this->scripts as $style) {
+            $echo .= $style ;
+        }
+        return $echo;
+    }
+
     public function addStylesheet($stylesheet)
     {
         $this->styles[] = "<link href=\"" . $stylesheet . "\" rel=\"stylesheet\" type=\"text/css\" />\n";

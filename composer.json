@@ -1,0 +1,16 @@
+{
+    "name": "root/fnx-journals",
+    "authors": [
+        {
+            "name": "Serhii Kukunin",
+            "email": "tamplier0608@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-0": {
+            "Core" : "vendor/",
+            "AppBundle" : "src/"
+        }
+    }
+}

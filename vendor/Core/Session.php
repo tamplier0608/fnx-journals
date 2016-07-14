@@ -11,9 +11,17 @@ use Core\Bag\ParameterBagInterface;
 class Session implements ParameterBagInterface
 {
     const SESSION_DEFAULT_STORAGE_KEY = 'app';
-
-    protected $namespace;
     protected static $flashBag;
+    protected $namespace;
+
+    public function __construct($nameSpace = '')
+    {
+        $this->namespace = !empty($nameSpace) ? $nameSpace : self::SESSION_DEFAULT_STORAGE_KEY;
+
+        if (!isset($_SESSION[$this->namespace])) {
+            $_SESSION[$this->namespace] = array();
+        }
+    }
 
     public static function start()
     {
@@ -30,28 +38,9 @@ class Session implements ParameterBagInterface
         session_id($id);
     }
 
-    public function isActive()
-    {
-        return $this->getStatus() === PHP_SESSION_ACTIVE;
-    }
-
-    public function getStatus()
-    {
-        return session_status();
-    }
-
     public static function destroy()
     {
         session_destroy();
-    }
-
-    public function __construct($nameSpace = '')
-    {
-        $this->namespace = !empty($nameSpace) ? $nameSpace : self::SESSION_DEFAULT_STORAGE_KEY;
-
-        if (!isset($_SESSION[$this->namespace])) {
-            $_SESSION[$this->namespace] = array();
-        }
     }
 
     public function getFlashBag()
@@ -71,6 +60,16 @@ class Session implements ParameterBagInterface
         return array_key_exists($key, $_SESSION[$this->namespace])
             ? $_SESSION[$this->namespace][$key]
             : $default;
+    }
+
+    public function isActive()
+    {
+        return $this->getStatus() === PHP_SESSION_ACTIVE;
+    }
+
+    public function getStatus()
+    {
+        return session_status();
     }
 
     public function set($key, $value)

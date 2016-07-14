@@ -51,11 +51,6 @@ class Controller
         return new Response($content);
     }
 
-    protected function redirect($url)
-    {
-        return new RedirectResponse($url);
-    }
-
     /**
      * @return mixed
      */
@@ -96,6 +91,11 @@ class Controller
     public function postDispatch()
     {
         
+    }
+
+    protected function redirect($url)
+    {
+        return new RedirectResponse($url);
     }
 
 }
